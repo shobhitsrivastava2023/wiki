@@ -26,7 +26,7 @@ const Homespace = () => {
   const title = searchParams.get("search") || ""
   const [searchResult, setSearchResult] = useState<SearchResult | null>(null)
   const [loading, setLoading] = useState(false)
-  const [searchTerm, setSearchTerm] = useState(title)
+
   const [open, setOpen] = useState(false)
   const [notebookName, setNotebookName] = useState("")
   const [description, setDescription] = useState("")
@@ -59,7 +59,7 @@ const Homespace = () => {
     const parts = text.split(urlRegex)
     const urls = text.match(urlRegex) || []
     return parts.map((part, i) =>
-      // @ts-ignore
+      // @ts-expect-error
       urls.includes(part) ? (
         <a key={i} href={part} target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:underline">
           {part}
