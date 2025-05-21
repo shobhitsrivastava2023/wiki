@@ -20,7 +20,11 @@ import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
 import { Button } from "@/components/ui/button"
 
-const Homespace = () => {
+interface HomespaceProps {
+  onCreateNotebook?: (name: string, description: string) => void
+}
+
+const Homespace = ({ onCreateNotebook }: HomespaceProps) => {
   const searchParams = useSearchParams()
   const router = useRouter()
   const title = searchParams.get("search") || ""
@@ -34,6 +38,11 @@ const Homespace = () => {
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
     console.log("Creating notebook:", { notebookName, description })
+
+    if (onCreateNotebook) {
+      onCreateNotebook(notebookName, description)
+    }
+
     setNotebookName("")
     setDescription("")
     setOpen(false)
@@ -66,12 +75,12 @@ const Homespace = () => {
         </a>
       ) : (
         part
-      )
+      ),
     )
   }
 
   return (
-    <div className="min-h-screen bg-[#EEEEEE] py-8 px-4">
+    <div className="h-full overflow-auto bg-[#EEEEEE] py-8 px-4">
       <div className="max-w-5xl mx-auto">
         {/* Search Bar */}
         <div className="mb-8 flex justify-center">
@@ -215,9 +224,6 @@ const Homespace = () => {
               </div>
             </div>
           </div>
-
-
-          
         </div>
         <div className="mt-6">
           <div className="bg-[#F9F9F9] p-6 rounded-lg shadow-sm">
