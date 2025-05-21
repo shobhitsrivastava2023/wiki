@@ -33,6 +33,11 @@ const SearchBar = ({
   const inputRef = useRef<HTMLInputElement>(null)
   const inputContainerRef = useRef<HTMLDivElement>(null)
 
+
+  const onSearchClick = () => { 
+    
+  }
+
   const handleSearch = () => {
     if (onSearch && query.trim()) {
       onSearch(query)
