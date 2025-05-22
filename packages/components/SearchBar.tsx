@@ -6,20 +6,13 @@ import { Search, X, TrendingUp } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { cn } from "@/lib/utils"
+import { fetchTrendingArticles } from "@/app/actions/fetchWikipedia"
 
 interface SearchBarProps {
   onSearch?: (query: string) => void
   placeholder?: string
   className?: string
 }
-
-const TRENDING_SEARCHES = [
-  "Climate change",
-  "Artificial intelligence",
-  "Olympic Games 2024",
-  "Quantum computing",
-  "Space exploration",
-]
 
 const SearchBar = ({
   onSearch,
@@ -29,10 +22,10 @@ const SearchBar = ({
   const [query, setQuery] = useState("")
   const [isFocused, setIsFocused] = useState(false)
   const [showTrending, setShowTrending] = useState(false)
+  const [trendingArticles, setTrendingArticles] = useState<Array<{ title: string }>>([])
   const dropdownRef = useRef<HTMLDivElement>(null)
   const inputRef = useRef<HTMLInputElement>(null)
   const inputContainerRef = useRef<HTMLDivElement>(null)
-
 
   const onSearchClick = () => { 
     
@@ -77,6 +70,15 @@ const SearchBar = ({
     return () => {
       document.removeEventListener("mousedown", handleClickOutside)
     }
+  }, [])
+
+  useEffect(() => {
+    const getTrendingArticles = async () => {
+      const articles = await fetchTrendingArticles(5)
+      setTrendingArticles(articles)
+    }
+
+    getTrendingArticles()
   }, [])
 
   return (
@@ -147,14 +149,14 @@ const SearchBar = ({
                 </div>
               </div>
               <ul className="py-1">
-                {TRENDING_SEARCHES.map((item, index) => (
+                {trendingArticles.map((article, index) => (
                   <li key={index}>
                     <button
                       className="w-full text-left px-4 py-2 text-sm hover:bg-[#f8f4d5] transition-colors duration-150 flex items-center gap-2 text-black/80"
-                      onClick={() => handleTrendingItemClick(item)}
+                      onClick={() => handleTrendingItemClick(article.title)}
                     >
                       <Search className="h-3.5 w-3.5 text-black/60" />
-                      {item}
+                      {article.title}
                     </button>
                   </li>
                 ))}

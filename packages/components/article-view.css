@@ -1,0 +1,321 @@
+/* Base article container styling */
+.article-container {
+  background-color: #EEEEEE;
+  box-shadow: none;
+  border-radius: 8px;
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 2rem 3rem;
+}
+
+/* Reading indicator */
+.reading-progress-container {
+  position: fixed;
+  top: 0;
+  width: 100%;
+  height: 4px;
+  background: transparent;
+  z-index: 1000;
+}
+
+.reading-progress-bar {
+  height: 100%;
+  background: #e1ff86;
+  width: 0%;
+  transition: width 0.1s ease;
+}
+
+/* Article title styling */
+.article-title {
+  font-family: "Playfair Display", Georgia, serif;
+  font-size: 2.5rem;
+  font-weight: 700;
+  margin-bottom: 1.5rem;
+  line-height: 1.2;
+  color: #3d3d3d;
+  padding-bottom: 0.75rem;
+  border-bottom: 1px solid #eaeaea;
+}
+
+/* Featured image styling */
+.featured-image-container {
+  margin: 2rem -3rem;
+  position: relative;
+}
+
+.featured-image {
+  width: 100%;
+  height: auto;
+  object-fit: cover;
+}
+
+.image-caption {
+  font-size: 0.875rem;
+  color: #666;
+  text-align: center;
+  margin-top: 0.5rem;
+  font-style: italic;
+}
+
+/* Main content styling */
+.article-content {
+  font-family: "Merriweather", Georgia, serif;
+  line-height: 1.8;
+  color: #504f4f;
+  font-size: 1.125rem;
+}
+
+
+
+/* Font size controls */
+.article-content.text-small {
+  font-size: 1rem;
+}
+
+.article-content.text-normal {
+  font-size: 1.125rem;
+}
+
+.article-content.text-large {
+  font-size: 1.25rem;
+}
+
+/* Headings */
+.article-content h1, .article-content h2, .article-content h3, 
+.article-content h4, .article-content h5, .article-content h6 {
+  font-family: "Playfair Display", Georgia, serif;
+  margin-top: 2em;
+  margin-bottom: 0.75em;
+  font-weight: 700;
+  line-height: 1.3;
+  color: #222;
+}
+
+.article-content h1 {
+  font-size: 2rem;
+  border-bottom: 1px solid #eaecef;
+  padding-bottom: 0.5em;
+}
+
+.article-content h2 {
+  font-size: 1.75rem;
+  border-bottom: 1px solid #eaecef;
+  padding-bottom: 0.3em;
+}
+
+.article-content h3 {
+  font-size: 1.5rem;
+}
+
+/* Paragraphs */
+.article-content p {
+  margin-bottom: 1.5em;
+  font-size: inherit;
+}
+
+/* First paragraph styling - drop cap */
+.article-content > p:first-of-type::first-letter {
+  float: left;
+  font-size: 3.25em;
+  line-height: 0.8;
+  padding-top: 0.1em;
+  padding-right: 0.1em;
+  font-family: "Playfair Display", Georgia, serif;
+  font-weight: bold;
+  color: #0366d6;
+}
+
+/* Links */
+.article-content a {
+  color: #060606;
+  text-decoration: none;
+  border-bottom: 2px solid rgba(53, 53, 53, 0.3);
+  transition: border-color 0.2s ease;
+}
+
+.article-content a:hover {
+  border-bottom: 1px solid #0366d6;
+  text-decoration: none;
+}
+
+/* Lists */
+.article-content ul, .article-content ol {
+  margin-bottom: 1.5em;
+  padding-left: 2em;
+}
+
+.article-content li {
+  margin-bottom: 0.5em;
+}
+
+/* Blockquotes */
+.article-content blockquote {
+  border-left: 4px solid #0366d6;
+  background-color: rgba(3, 102, 214, 0.05);
+  padding: 1rem 1.5rem;
+  margin: 2rem 0;
+  font-style: italic;
+  color: #444;
+  border-radius: 0 4px 4px 0;
+}
+
+.article-content blockquote p:last-child {
+  margin-bottom: 0;
+}
+
+/* Code blocks */
+.article-content pre {
+  background-color: #f6f8fa;
+  border-radius: 6px;
+  padding: 16px;
+  overflow: auto;
+  font-size: 85%;
+  line-height: 1.45;
+  margin-bottom: 1.5em;
+}
+
+.article-content code {
+  background-color: rgba(27, 31, 35, 0.05);
+  border-radius: 3px;
+  font-size: 85%;
+  padding: 0.2em 0.4em;
+  font-family: SFMono-Regular, Consolas, "Liberation Mono", Menlo, monospace;
+}
+
+/* Tables */
+.article-content table {
+  border-collapse: collapse;
+  width: 100%;
+  margin: 2rem 0;
+  font-size: 0.9em;
+}
+
+.article-content table th, .article-content table td {
+  padding: 12px;
+  border: 1px solid #eaeaea;
+}
+
+.article-content table th {
+  background-color: #f6f8fa;
+  font-weight: 600;
+  color: #333;
+}
+
+.article-content table tr:nth-child(even) {
+  background-color: #f9f9f9;
+}
+
+/* Images */
+.article-content img {
+  max-width: 100%;
+  height: auto;
+  margin: 2rem auto;
+  display: block;
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+/* Figure captions */
+.article-content figure {
+  margin: 2rem 0;
+}
+
+.article-content figcaption {
+  text-align: center;
+  font-size: 0.875rem;
+  color: #666;
+  margin-top: 0.5rem;
+  font-style: italic;
+}
+
+/* Nice horizontal rule */
+.article-content hr {
+  border: 0;
+  height: 1px;
+  background-image: linear-gradient(to right, rgba(0, 0, 0, 0), rgba(0, 0, 0, 0.2), rgba(0, 0, 0, 0));
+  margin: 2rem 0;
+}
+
+/* Reading time indicator */
+.reading-time {
+  font-size: 0.875rem;
+  color: #666;
+  margin-bottom: 2rem;
+  display: flex;
+  align-items: center;
+}
+
+.reading-time svg {
+  margin-right: 0.5rem;
+}
+
+/* Article summary */
+.article-summary {
+  font-size: 1.25rem;
+  line-height: 1.6;
+  color: #444;
+  font-family: "Merriweather", Georgia, serif;
+  font-style: italic;
+  margin: 2rem 0;
+  padding: 1rem 2rem;
+  border-left: 4px solid #0366d6;
+  background-color: rgba(3, 102, 214, 0.05);
+}
+
+/* Add more space between sections */
+.article-content > * + h2 {
+  margin-top: 3rem;
+}
+
+/* Small decorative elements */
+.article-content h2::before {
+  content: "";
+  display: block;
+  width: 40px;
+  height: 4px;
+  background-color: #0366d6;
+  margin-bottom: 0.5rem;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .article-container {
+    padding: 1.5rem;
+  }
+  
+  .featured-image-container {
+    margin: 1.5rem -1.5rem;
+  }
+  
+  .article-title {
+    font-size: 2rem;
+  }
+  
+  .article-content.text-small {
+    font-size: 0.9rem;
+  }
+  
+  .article-content.text-normal {
+    font-size: 1rem;
+  }
+  
+  .article-content.text-large {
+    font-size: 1.125rem;
+  }
+  
+  .article-content h1 {
+    font-size: 1.75rem;
+  }
+  
+  .article-content h2 {
+    font-size: 1.5rem;
+  }
+  
+  .article-content h3 {
+    font-size: 1.25rem;
+  }
+  
+  .article-content > p:first-of-type::first-letter {
+    font-size: 2.75em;
+  }
+}
