@@ -27,6 +27,7 @@ import { vscDarkPlus } from "react-syntax-highlighter/dist/esm/styles/prism"
 import { cn } from "@/lib/utils"
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip"
 import { Separator } from "@/components/ui/separator"
+import styles from './Notebook.module.css'
 
 interface NotebookProps {
   name: string
@@ -242,7 +243,7 @@ Start typing your notes here...
   }
 
   return (
-    <div className="flex flex-col h-full bg-[#1e1e1e] text-gray-300">
+     <div className={`${styles['notebook-editor']} flex flex-col h-full`}>
       {/* Header */}
       <header className="flex items-center h-16 px-4 border-b border-gray-800 shrink-0">
         <div className="flex items-center gap-2 text-lg font-semibold sm:text-base">
@@ -506,7 +507,7 @@ Start typing your notes here...
                   },
                   // Customize other elements as needed
                   h1: ({ children }) => (
-                    <h1 className="text-2xl font-bold mt-6 mb-4 pb-1 border-b border-gray-700">{children}</h1>
+                    <h1 className="text-xl font-bold mt-6 mb-4 pb-1 border-b  border-gray-700 text-gray-300 !important">{children}</h1>
                   ),
                   h2: ({ children }) => <h2 className="text-xl font-bold mt-5 mb-3">{children}</h2>,
                   h3: ({ children }) => <h3 className="text-lg font-bold mt-4 mb-2">{children}</h3>,

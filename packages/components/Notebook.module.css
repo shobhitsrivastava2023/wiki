@@ -1,0 +1,24 @@
+.notebook-editor {
+  /* Base styles */
+  background-color: #1e1e1e;
+  color: rgb(209 213 219);
+}
+
+.notebook-editor h1 {
+  color: rgb(209 213 219) !important;
+}
+
+.notebook-editor h2 {
+  color: rgb(209 213 219) !important;
+}
+.notebook-editor .prose {
+  color: rgb(209 213 219) !important;
+}
+
+.notebook-editor .prose h1,
+.notebook-editor .prose h2,
+.notebook-editor .prose h3 {
+  color: rgb(209 213 219) !important;
+}
+
+/* Add any other specific overrides needed */
