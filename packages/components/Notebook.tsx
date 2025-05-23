@@ -1,7 +1,6 @@
 "use client"
 
 import type React from "react"
-
 import { useRef, useState } from "react"
 import {
   Bold,
@@ -19,6 +18,7 @@ import {
   Redo,
   ImageIcon,
   Link,
+  X,
 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import ReactMarkdown from "react-markdown"
@@ -27,14 +27,15 @@ import { vscDarkPlus } from "react-syntax-highlighter/dist/esm/styles/prism"
 import { cn } from "@/lib/utils"
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip"
 import { Separator } from "@/components/ui/separator"
-import styles from './Notebook.module.css'
+import styles from "./Notebook.module.css"
 
 interface NotebookProps {
   name: string
   description: string
+  onClose?: () => void
 }
 
-export default function Notebook({ name, description }: NotebookProps) {
+export default function Notebook({ name, description, onClose }: NotebookProps) {
   const [content, setContent] = useState(`# ${name || "Untitled Notebook"}
 
 ${description || "No description provided."}
@@ -243,7 +244,19 @@ Start typing your notes here...
   }
 
   return (
-     <div className={`${styles['notebook-editor']} flex flex-col h-full`}>
+    <div className={`${styles["notebook-editor"]} flex flex-col h-full relative`}>
+      {/* Close button in the top-right corner */}
+      {onClose && (
+        <Button
+          variant="ghost"
+          size="icon"
+          className="absolute top-2 right-2 z-50 bg-gray-800/80 hover:bg-gray-700 text-gray-300"
+          onClick={onClose}
+        >
+          <X className="h-4 w-4" />
+        </Button>
+      )}
+
       {/* Header */}
       <header className="flex items-center h-16 px-4 border-b border-gray-800 shrink-0">
         <div className="flex items-center gap-2 text-lg font-semibold sm:text-base">
@@ -495,7 +508,7 @@ Start typing your notes here...
                   code({ node, inline, className, children, ...props }) {
                     const match = /language-(\w+)/.exec(className || "")
                     return !inline && match ? (
-                       // @ts-expect-error
+                      // @ts-expect-error
                       <SyntaxHighlighter style={vscDarkPlus} language={match[1]} PreTag="div" {...props}>
                         {String(children).replace(/\n$/, "")}
                       </SyntaxHighlighter>
@@ -507,21 +520,29 @@ Start typing your notes here...
                   },
                   // Customize other elements as needed
                   h1: ({ children }) => (
-                    <h1 className="text-xl font-bold mt-6 mb-4 pb-1 border-b  border-gray-700 text-gray-300 !important">{children}</h1>
+                    <h1 className="text-xl font-bold mt-6 mb-4 pb-1 border-b border-gray-700 text-gray-300 !important">
+                      {children}
+                    </h1>
                   ),
-                  h2: ({ children }) => <h2 className="text-xl font-bold mt-5 mb-3">{children}</h2>,
-                  h3: ({ children }) => <h3 className="text-lg font-bold mt-4 mb-2">{children}</h3>,
-                  p: ({ children }) => <p className="mb-4">{children}</p>,
-                  ul: ({ children }) => <ul className="list-disc pl-6 mb-4">{children}</ul>,
-                  ol: ({ children }) => <ol className="list-decimal pl-6 mb-4">{children}</ol>,
-                  li: ({ children }) => <li className="mb-1">{children}</li>,
+                  h2: ({ children }) => (
+                    <h2 className="text-xl font-bold mt-5 mb-3 text-gray-300 !important">{children}</h2>
+                  ),
+                  h3: ({ children }) => (
+                    <h3 className="text-lg font-bold mt-4 mb-2 text-gray-300 !important">{children}</h3>
+                  ),
+                  p: ({ children }) => <p className="mb-4 text-gray-300 !important">{children}</p>,
+                  ul: ({ children }) => <ul className="list-disc pl-6 mb-4 text-gray-300 !important">{children}</ul>,
+                  ol: ({ children }) => <ol className="list-decimal pl-6 mb-4 text-gray-300 !important">{children}</ol>,
+                  li: ({ children }) => <li className="mb-1 text-gray-300 !important">{children}</li>,
                   a: ({ href, children }) => (
                     <a href={href} className="text-blue-400 hover:underline" target="_blank" rel="noopener noreferrer">
                       {children}
                     </a>
                   ),
                   blockquote: ({ children }) => (
-                    <blockquote className="border-l-4 border-gray-600 pl-4 italic my-4">{children}</blockquote>
+                    <blockquote className="border-l-4 border-gray-600 pl-4 italic my-4 text-gray-300 !important">
+                      {children}
+                    </blockquote>
                   ),
                 }}
               >

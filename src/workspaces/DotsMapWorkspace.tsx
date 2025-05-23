@@ -1,30 +1,43 @@
 "use client"
 
-import { useCallback } from "react"
-import { useRouter } from "next/navigation"
-import DotMapsContainer from "../../packages/components/dotmaps/dot-maps-container"
+import { useState, useCallback } from "react"
+import DotMaps from "../../packages/components/dotmaps/dotmap"
+import { Button } from "@/components/ui/button"
+import { X } from "lucide-react"
 
 interface DotMapsWorkspaceProps {
   onSelectArticle?: (title: string) => void
+  onClose?: () => void
 }
 
-// Update the DotMapsWorkspace to support the inPanel mode
-export default function DotMapsWorkspace({
-  onSelectArticle,
-  inPanel = true,
-}: DotMapsWorkspaceProps & { inPanel?: boolean }) {
-  const router = useRouter()
+export default function DotMapsWorkspace({ onSelectArticle, onClose }: DotMapsWorkspaceProps) {
+  const [isFullscreen, setIsFullscreen] = useState(false)
+  const [currentMapId, setCurrentMapId] = useState("default")
 
-  const handleSelectArticle = useCallback(
-    (title: string) => {
-      if (onSelectArticle) {
-        onSelectArticle(title)
-      } else {
-        router.push(`/homespace?search=${encodeURIComponent(title)}`)
-      }
-    },
-    [onSelectArticle, router],
+  const handleToggleFullscreen = useCallback(() => {
+    setIsFullscreen(!isFullscreen)
+  }, [isFullscreen])
+
+  return (
+    <div className="relative h-full w-full">
+      {/* Close button in the top-right corner */}
+      {onClose && (
+        <Button
+          variant="ghost"
+          size="icon"
+          className="absolute top-2 right-2 z-50 bg-white/80 hover:bg-white shadow-sm"
+          onClick={onClose}
+        >
+          <X className="h-4 w-4" />
+        </Button>
+      )}
+
+      <DotMaps
+        mapId={currentMapId}
+        onSelectArticle={onSelectArticle}
+        isFullscreen={isFullscreen}
+        onToggleFullscreen={handleToggleFullscreen}
+      />
+    </div>
   )
-
-  return <DotMapsContainer onSelectArticle={handleSelectArticle} inPanel={inPanel} />
 }

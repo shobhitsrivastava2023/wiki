@@ -80,6 +80,16 @@ export default function HomePage() {
     setShowDotMaps(!showDotMaps)
   }, [showDotMaps])
 
+  // Add a function to close DotMaps
+  const handleCloseDotMaps = useCallback(() => {
+    setShowDotMaps(false)
+  }, [])
+
+  // Add a function to close Notebook
+  const handleCloseNotebook = useCallback(() => {
+    setShowNotebook(false)
+  }, [])
+
   // When not showing the notebook or dotmaps, Homespace or ArticleView takes up the full screen
   if (!showNotebook && !showDotMaps) {
     if (isLoading) {
@@ -114,7 +124,7 @@ export default function HomePage() {
           {/* Notebook Panel */}
           <ResizablePanel defaultSize={30} minSize={20}>
             <div className="h-full overflow-y-auto">
-              <Notebook name={notebookName} description={description} />
+              <Notebook name={notebookName} description={description} onClose={handleCloseNotebook} />
             </div>
           </ResizablePanel>
           <ResizableHandle withHandle />
@@ -122,7 +132,7 @@ export default function HomePage() {
           {/* DotMaps Panel */}
           <ResizablePanel defaultSize={40} minSize={30}>
             <div className="h-full overflow-hidden">
-              <DotMapsWorkspace onSelectArticle={handleViewFullArticle} />
+              <DotMapsWorkspace onSelectArticle={handleViewFullArticle} onClose={handleCloseDotMaps} />
             </div>
           </ResizablePanel>
           <ResizableHandle withHandle />
@@ -157,10 +167,10 @@ export default function HomePage() {
         <ResizablePanel defaultSize={50} minSize={30}>
           <div className="h-full overflow-y-auto">
             {showNotebook ? (
-              <Notebook name={notebookName} description={description} />
+              <Notebook name={notebookName} description={description} onClose={handleCloseNotebook} />
             ) : (
               <div className="h-full">
-                <DotMapsWorkspace onSelectArticle={handleViewFullArticle} />
+                <DotMapsWorkspace onSelectArticle={handleViewFullArticle} onClose={handleCloseDotMaps} />
               </div>
             )}
           </div>
@@ -192,3 +202,5 @@ export default function HomePage() {
     </div>
   )
 }
+
+
