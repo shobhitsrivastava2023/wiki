@@ -3,7 +3,7 @@
 
 import { useState } from "react";
 import { AuthDialogBase } from "./authDialogBase";
- // Adjust path as needed
+import { signIn, signUp } from "@/app/actions/auth"; // Adjust path as needed
 
 interface SignInDialogProps {
   onClose: () => void;
@@ -15,10 +15,12 @@ export const SignInDialog = ({ onClose, setIsSignUpOpen }: SignInDialogProps) =>
   const [password, setPassword] = useState<string>("");
   const [rememberMe, setRememberMe] = useState<boolean>(false);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     // Handle sign-in logic here (e.g., API call)
-    console.log("Sign In:", { email, password, rememberMe });
+
+    const response = await signIn(email, password);
+    console.log("Sign In Response:", response)
     onClose();
   };
 
@@ -29,7 +31,7 @@ export const SignInDialog = ({ onClose, setIsSignUpOpen }: SignInDialogProps) =>
     }
     // No action needed for 'signin' as we are already in sign-in dialog
   };
-
+ 
   return (
     <AuthDialogBase
       onClose={onClose}
@@ -106,12 +108,14 @@ interface SignUpDialogProps {
 export const SignUpDialog = ({ onClose, setIsSignInOpen }: SignUpDialogProps) => {
   const [email, setEmail] = useState<string>("");
   const [password, setPassword] = useState<string>("");
-  const [confirmPassword, setConfirmPassword] = useState<string>("");
+  const [username, setUsername] = useState<string>("");
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     // Handle sign-up logic here (e.g., API call)
-    console.log("Sign Up:", { email, password });
+    const response = signUp(email, password, username)
+    console.log("Sign Up Response:", response)
+   
     onClose();
   };
 
@@ -148,31 +152,31 @@ export const SignUpDialog = ({ onClose, setIsSignInOpen }: SignUpDialogProps) =>
         </div>
 
         <div>
-          <label htmlFor="password" className="block text-gray-700 font-medium mb-1">
-            Password
+          <label htmlFor="username" className="block text-gray-700 font-medium mb-1">
+            Username
           </label>
           <input
-            type="password"
-            id="password"
+           
+            id="username"
             className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-gray-400"
-            placeholder="password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
+            placeholder="username"
+            value={username}
+            onChange={(e) => setUsername(e.target.value)}
             required
           />
         </div>
 
         <div>
-          <label htmlFor="confirmPassword" className="block text-gray-700 font-medium mb-1">
-            Confirm Password
+          <label htmlFor="password" className="block text-gray-700 font-medium mb-1">
+            Password
           </label>
           <input
             type="password"
             id="confirmPassword"
             className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-gray-400"
             placeholder="confirm password"
-            value={confirmPassword}
-            onChange={(e) => setConfirmPassword(e.target.value)}
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
             required
           />
         </div>

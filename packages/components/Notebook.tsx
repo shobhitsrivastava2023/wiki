@@ -1,7 +1,7 @@
 "use client"
 
 import type React from "react"
-import { useRef, useState } from "react"
+import { useEffect, useRef, useState } from "react"
 import {
   Bold,
   Code,
@@ -28,14 +28,20 @@ import { cn } from "@/lib/utils"
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip"
 import { Separator } from "@/components/ui/separator"
 import styles from "./Notebook.module.css"
+import { authClient } from "@/lib/auth-client"
+import { createNotebook, updateNotebook } from "@/app/actions/saveNotebook" // Import the updateNotebook server action
 
+
+import { cookies } from "next/headers"
+import { getUserId } from "@/app/actions/getSession"
 interface NotebookProps {
   name: string
   description: string
   onClose?: () => void
+  notebookId: string // Add notebookId to props
 }
 
-export default function Notebook({ name, description, onClose }: NotebookProps) {
+export default function Notebook({ name, description, onClose, notebookId }: NotebookProps) {
   const [content, setContent] = useState(`# ${name || "Untitled Notebook"}
 
 ${description || "No description provided."}
@@ -46,8 +52,65 @@ Start typing your notes here...
 
 `)
   const [isPreview, setIsPreview] = useState(false)
+ 
+  const [isSaving, setIsSaving] = useState(false)
   const textareaRef = useRef<HTMLTextAreaElement>(null)
   const [selection, setSelection] = useState({ start: 0, end: 0 })
+  const [userId, setUserId] = useState<string | null>(null)
+
+useEffect(() => {
+  const loadUserId = async () => {
+    try {
+      const response = await fetch('/api/user')
+      const data = await response.json()
+      
+      if (response.ok) {
+        setUserId(data.userId)
+      } else {
+        console.error('Failed to load user ID:', data.error)
+      }
+    } catch (error) {
+      console.error('Failed to load user ID:', error)
+    }
+  }
+  
+  loadUserId()
+}, [])
+
+const onSaveNotebook = async () => {
+  if (!userId) {
+    console.log('No user ID available')
+    return
+  }
+
+  setIsSaving(true)
+  try {
+    const response = await fetch('/api/notebook', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        userId,
+        name,
+        content,
+        notebookId: notebookId || null, // Include notebookId for updates
+      }),
+    })
+
+    const result = await response.json()
+
+    if (response.ok && result.success) {
+      console.log('Success on saving the notebook')
+    } else {
+      console.log('Could not save the notebook:', result.error)
+    }
+  } catch (error) {
+    console.error('Error saving notebook:', error)
+  } finally {
+    setIsSaving(false)
+  }
+}
 
   // Save selection when textarea is focused
   const handleSelect = () => {
@@ -263,6 +326,16 @@ Start typing your notes here...
           <Frame className="w-6 h-6" />
           <span>{name || "Untitled Notebook"}</span>
         </div>
+        <div className="ml-4 text-sm">
+          <Button 
+            className="bg-[#EEEEEE] text-black hover:text-white" 
+            onClick={onSaveNotebook}
+            disabled={isSaving}
+          >
+            <span>{isSaving ? "Saving..." : "Save"}</span>
+          </Button>
+        </div>
+
         <div className="ml-auto flex items-center gap-2">
           <Button
             variant="ghost"
@@ -463,6 +536,7 @@ Start typing your notes here...
                 </TooltipTrigger>
                 <TooltipContent>Code Block</TooltipContent>
               </Tooltip>
+
             </div>
           </TooltipProvider>
 
@@ -491,7 +565,7 @@ Start typing your notes here...
                 </Button>
               </TooltipTrigger>
               <TooltipContent>Redo</TooltipContent>
-            </Tooltip>
+              </Tooltip>
           </div>
         </div>
       )}
