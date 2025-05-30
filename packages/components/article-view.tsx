@@ -27,7 +27,9 @@ export default function ArticleView({ title, onBack }: ArticleViewProps) {
   const contentRef = useRef<HTMLDivElement>(null)
 
   const onSearch = (query: string) => {
-    router.push(`/homespace?search=${query}`)
+    // Ensure proper URL encoding for the search parameter
+    const encodedQuery = encodeURIComponent(query)
+    router.push(`/homespace?search=${encodedQuery}`)
   }
 
   useEffect(() => {
@@ -66,11 +68,10 @@ export default function ArticleView({ title, onBack }: ArticleViewProps) {
       const timeoutId = setTimeout(() => {
         const cleanup = initReadingProgress()
         return cleanup
-      }, 100); // Small delay
-      return () => clearTimeout(timeoutId);
+      }, 100) // Small delay
+      return () => clearTimeout(timeoutId)
     }
-  }, [loading, article]);
-
+  }, [loading, article])
 
   // Handle scroll to show/hide scroll-to-top button
   useEffect(() => {
@@ -98,6 +99,64 @@ export default function ArticleView({ title, onBack }: ArticleViewProps) {
       behavior: "smooth",
     })
   }
+
+
+  const sanitizeContent = (content: string): string => {
+    const parser = new DOMParser()
+    const doc = parser.parseFromString(content, "text/html")
+
+    // Convert Wikipedia links to your app's search links
+    doc.querySelectorAll("a").forEach((link) => {
+      const href = link.getAttribute("href")
+      if (href && href.startsWith("/wiki/")) {
+        // Extract the article title from Wikipedia link
+        const title = decodeURIComponent(href.replace("/wiki/", ""))
+        // Set up for internal handling
+        link.setAttribute("href", `/homespace?search=${title}`)
+        link.setAttribute("data-article-title", `/homespace?search=${title}`)
+        link.classList.add("internal-link")
+        link.style.color = "#2563eb"
+        link.style.textDecoration = "underline"
+      } else if (href && href.startsWith("http") && !href.includes("wikipedia.org")) {
+        // External links should open in new tab
+        link.setAttribute("target", "_blank")
+        link.setAttribute("rel", "noopener noreferrer")
+      }
+    })
+
+    return doc.body.innerHTML
+  }
+
+  useEffect(() => {
+    const handleInternalLinks = (e: MouseEvent) => {
+      const target = e.target as HTMLElement
+      const link = target.closest("a")
+
+      if (link?.classList.contains("internal-link")) {
+        e.preventDefault()
+        e.stopPropagation()
+
+        const title = link.getAttribute("data-article-title")
+        console.log("internal link clicked:", title)
+        if (title) {
+          console.log("Navigating to article:", title)
+          // Navigate back to homespace with the new search
+          onSearch(title)
+          // Also trigger the back action to return to summary view
+          onBack()
+        }
+      }
+    }
+
+    // Add event listener to the content container specifically
+    const contentElement = contentRef.current
+    if (contentElement) {
+      contentElement.addEventListener("click", handleInternalLinks)
+      return () => contentElement.removeEventListener("click", handleInternalLinks)
+    }
+  }, [router, onSearch, onBack])
+
+  console.log("title:", title)
 
   return (
     // REMOVED: h-full w-full overflow-auto from this div.
@@ -181,14 +240,14 @@ export default function ArticleView({ title, onBack }: ArticleViewProps) {
                       {article.readingTime && ` • ${article.readingTime} min read`}
                     </p>
                   )}
-                 
-
 
                   {article.articleContent ? (
                     <div
                       ref={contentRef}
                       className={`article-content text-${fontSize} prose prose-slate max-w-none`}
-                      dangerouslySetInnerHTML={{ __html: article.articleContent }}
+                      dangerouslySetInnerHTML={{
+                        __html: sanitizeContent(article.articleContent),
+                      }}
                     />
                   ) : (
                     <p className="article-summary">{article.summary}</p>
@@ -207,7 +266,7 @@ export default function ArticleView({ title, onBack }: ArticleViewProps) {
                           >
                             {related.thumbnail && (
                               <img
-                                src={related.thumbnail}
+                                src={related.thumbnail || "/placeholder.svg"}
                                 alt={related.title}
                                 className="w-full h-32 object-cover rounded-md mb-3"
                               />
@@ -241,7 +300,6 @@ export default function ArticleView({ title, onBack }: ArticleViewProps) {
                       </div>
                     </div>
                   )}
-
                 </div>
               )}
             </div>

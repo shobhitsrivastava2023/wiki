@@ -28,21 +28,19 @@ import { cn } from "@/lib/utils"
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip"
 import { Separator } from "@/components/ui/separator"
 import styles from "./Notebook.module.css"
-import { authClient } from "@/lib/auth-client"
-import { createNotebook, updateNotebook } from "@/app/actions/saveNotebook" // Import the updateNotebook server action
 
-
-import { cookies } from "next/headers"
-import { getUserId } from "@/app/actions/getSession"
 interface NotebookProps {
   name: string
   description: string
   onClose?: () => void
-  notebookId: string // Add notebookId to props
+  notebookId: string
+  initialContent?: string
 }
 
-export default function Notebook({ name, description, onClose, notebookId }: NotebookProps) {
-  const [content, setContent] = useState(`# ${name || "Untitled Notebook"}
+export default function Notebook({ name, description, onClose, notebookId, initialContent }: NotebookProps) {
+  const [content, setContent] = useState(
+    initialContent ||
+      `# ${name || "Untitled Notebook"}
 
 ${description || "No description provided."}
 
@@ -50,67 +48,90 @@ ${description || "No description provided."}
 
 Start typing your notes here...
 
-`)
+`,
+  )
   const [isPreview, setIsPreview] = useState(false)
- 
   const [isSaving, setIsSaving] = useState(false)
   const textareaRef = useRef<HTMLTextAreaElement>(null)
   const [selection, setSelection] = useState({ start: 0, end: 0 })
   const [userId, setUserId] = useState<string | null>(null)
 
-useEffect(() => {
-  const loadUserId = async () => {
+  // Load initial content when component mounts or when initialContent changes
+  useEffect(() => {
+    if (initialContent) {
+      setContent(initialContent)
+    }
+  }, [initialContent])
+
+  useEffect(() => {
+    const loadUserId = async () => {
+      try {
+        const response = await fetch("/api/user")
+        const data = await response.json()
+
+        if (response.ok) {
+          setUserId(data.userId)
+        } else {
+          console.error("Failed to load user ID:", data.error)
+        }
+      } catch (error) {
+        console.error("Failed to load user ID:", error)
+      }
+    }
+
+    loadUserId()
+  }, [])
+
+  const onSaveNotebook = async () => {
+    if (!userId) {
+      console.log("No user ID available")
+      return
+    }
+
+    setIsSaving(true)
     try {
-      const response = await fetch('/api/user')
-      const data = await response.json()
-      
-      if (response.ok) {
-        setUserId(data.userId)
+      // Use the updateNotebook server action for existing notebooks
+      if (notebookId) {
+        const { updateNotebook } = await import("@/app/actions/saveNotebook")
+        const result = await updateNotebook(notebookId, {
+          title: name,
+          description,
+          content,
+        })
+
+        if (result.success) {
+          console.log("Notebook updated successfully")
+        } else {
+          console.log("Could not update the notebook:", result.error)
+        }
       } else {
-        console.error('Failed to load user ID:', data.error)
+        // Create new notebook if no ID exists
+        const response = await fetch("/api/notebook", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            userId,
+            name,
+            content,
+          }),
+        })
+
+        const result = await response.json()
+
+        if (response.ok && result.success) {
+          console.log("Success on saving the notebook")
+        } else {
+          console.log("Could not save the notebook:", result.error)
+        }
       }
     } catch (error) {
-      console.error('Failed to load user ID:', error)
+      console.error("Error saving notebook:", error)
+    } finally {
+      setIsSaving(false)
     }
   }
-  
-  loadUserId()
-}, [])
-
-const onSaveNotebook = async () => {
-  if (!userId) {
-    console.log('No user ID available')
-    return
-  }
-
-  setIsSaving(true)
-  try {
-    const response = await fetch('/api/notebook', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        userId,
-        name,
-        content,
-        notebookId: notebookId || null, // Include notebookId for updates
-      }),
-    })
-
-    const result = await response.json()
-
-    if (response.ok && result.success) {
-      console.log('Success on saving the notebook')
-    } else {
-      console.log('Could not save the notebook:', result.error)
-    }
-  } catch (error) {
-    console.error('Error saving notebook:', error)
-  } finally {
-    setIsSaving(false)
-  }
-}
 
   // Save selection when textarea is focused
   const handleSelect = () => {
@@ -327,11 +348,7 @@ const onSaveNotebook = async () => {
           <span>{name || "Untitled Notebook"}</span>
         </div>
         <div className="ml-4 text-sm">
-          <Button 
-            className="bg-[#EEEEEE] text-black hover:text-white" 
-            onClick={onSaveNotebook}
-            disabled={isSaving}
-          >
+          <Button className="bg-[#EEEEEE] text-black hover:text-white" onClick={onSaveNotebook} disabled={isSaving}>
             <span>{isSaving ? "Saving..." : "Save"}</span>
           </Button>
         </div>
@@ -536,7 +553,6 @@ const onSaveNotebook = async () => {
                 </TooltipTrigger>
                 <TooltipContent>Code Block</TooltipContent>
               </Tooltip>
-
             </div>
           </TooltipProvider>
 
@@ -565,7 +581,7 @@ const onSaveNotebook = async () => {
                 </Button>
               </TooltipTrigger>
               <TooltipContent>Redo</TooltipContent>
-              </Tooltip>
+            </Tooltip>
           </div>
         </div>
       )}
